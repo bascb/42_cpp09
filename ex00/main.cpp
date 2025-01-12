@@ -6,12 +6,13 @@
 /*   By: bcastelo <bcastelo@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/21 11:25:14 by bcastelo          #+#    #+#             */
-/*   Updated: 2024/12/21 13:04:01 by bcastelo         ###   ########.fr       */
+/*   Updated: 2025/01/12 16:07:07 by bcastelo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
 #include <fstream>
+#include <exception>
 #include "BitcoinExchange.hpp"
 
 int	main(int argc, char **argv)
@@ -31,11 +32,18 @@ int	main(int argc, char **argv)
         std::cout << "Error: could not open file." << std::endl;
         return (1);
     }
-
-    while (std::getline(file, line))
+    try
     {
-        std::cout << line << std::endl;
+        prices.initDatabase("data.csv");
+        while (std::getline(file, line))
+        {
+            prices.printEntryValue(line);
+        }
     }
+    catch (std::exception & e)
+	{
+		std::cerr << "Error: " << e.what() << std::endl;
+	}
 
     file.close();
     return (0);
