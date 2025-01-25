@@ -6,12 +6,13 @@
 /*   By: bcastelo <bcastelo@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/21 22:53:08 by bcastelo          #+#    #+#             */
-/*   Updated: 2025/01/21 23:04:24 by bcastelo         ###   ########.fr       */
+/*   Updated: 2025/01/25 11:45:06 by bcastelo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
 #include <string>
+#include "RPN.hpp"
 
 int	main(int argc, char **argv)
 {
@@ -23,6 +24,11 @@ int	main(int argc, char **argv)
     }
 
     expression = argv[1];
+    if (!expression.size() || !validate_expression(expression))
+    {
+        std::cerr << "Error: invalid input." << std::endl;
+        return (1);
+    }
     std::cout << expression << std::endl;
     
     return (0);
