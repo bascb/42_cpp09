@@ -6,11 +6,15 @@
 /*   By: bcastelo <bcastelo@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 11:22:23 by bcastelo          #+#    #+#             */
-/*   Updated: 2025/02/04 23:08:36 by bcastelo         ###   ########.fr       */
+/*   Updated: 2025/02/09 22:10:50 by bcastelo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "PmergeMe.hpp"
+
+void sort_pairs_with_vector(std::vector<unsigned int>& data, std::vector<unsigned int>::iterator start, std::vector<unsigned int>::iterator end, unsigned int set_size);
+
+void sort_all_pairs_with_vector(std::vector<unsigned int>& data, std::vector<unsigned int>::iterator start, std::vector<unsigned int>::iterator end);
 
 int insert_into_vector(int argc, char **argv, std::vector<unsigned int>& numbers);
 
@@ -22,21 +26,77 @@ bool is_duplicated_in_vector(std::vector<unsigned int>& data, unsigned int value
 
 void print_vector(std::vector<unsigned int>& data, std::string label);
 
-double getTimeInMicroseconds(void);
+void print_unordered(int argc, char **argv);
+
+double get_time_microseconds(void);
+
+std::vector<unsigned int> fordJohnsonSort(std::vector<unsigned int> arr);
 
 int sort_with_vector(int argc, char **argv)
 {
     std::vector<unsigned int> unordered;
+    std::vector<unsigned int> sorted;
     double start;
     double end;
      
-    start = getTimeInMicroseconds();
+    start = get_time_microseconds();
     if (!insert_into_vector(argc, argv, unordered))
         return (-1);
-    end = getTimeInMicroseconds();
-    print_vector(unordered, "Before : ");
+    sort_pairs_with_vector(unordered, unordered.begin(), unordered.end(), 1);
+    sort_all_pairs_with_vector(unordered, unordered.begin(), unordered.end());
+    end = get_time_microseconds();
+    print_unordered(argc, argv);
+    print_vector(unordered, "After : ");
     std::cout << "Time to process a range of " << unordered.size() << " elements with std::vector : " << end - start << " us" << std::endl;
     return (0);
+}
+
+void sort_pairs_with_vector(std::vector<unsigned int>& data, std::vector<unsigned int>::iterator start, std::vector<unsigned int>::iterator end, unsigned int set_size)
+{
+    unsigned int aux;
+    unsigned int pair_size = set_size * 2;
+    std::vector<unsigned int>::iterator init = start;
+    
+    while (init + pair_size - 1 < end)
+    {
+        if (*(init + set_size - 1) > *(init + pair_size - 1))
+        {
+            for (std::vector<unsigned int>::iterator it = init; it < init + set_size; ++it)
+            {
+                aux = *it;
+                *it = *(it + set_size);
+                *(it + set_size) = aux;
+            }
+        }
+        init += pair_size;
+    }
+    print_vector(data, "Iteration : ");
+    if (pair_size < end - start)
+        sort_pairs_with_vector(data, start, end, set_size * 2);
+}
+
+void sort_all_pairs_with_vector(std::vector<unsigned int>& data, std::vector<unsigned int>::iterator start, std::vector<unsigned int>::iterator end)
+{
+    std::vector<unsigned int>::iterator exte;
+    std::vector<unsigned int>::iterator inte;
+    unsigned int aux;
+    
+    for (exte = start + 1; exte + 2 < end; exte += 2)
+    {
+        for (inte = exte + 2; inte < end; inte += 2)
+        {
+            if (*exte > *inte)
+            {
+                aux = *exte;
+                *exte = *inte;
+                *inte = aux;
+                aux = *(exte - 1);
+                *(exte - 1) = *(inte - 1);
+                *(inte - 1) = aux;
+            }
+            print_vector(data, "Sorting : ");
+        }
+    }
 }
 
 int insert_into_vector(int argc, char **argv, std::vector<unsigned int>& numbers)
@@ -100,10 +160,61 @@ void print_vector(std::vector<unsigned int>& data, std::string label)
     std::cout << std::endl;
 }
 
-double getTimeInMicroseconds(void)
+void print_unordered(int argc, char **argv)
+{
+    std::cout << "Before : "; 
+    for (int i = 1; i < argc; ++i)
+    {
+        std::cout << argv[i] << " ";
+    }
+    std::cout << std::endl; 
+}
+
+double get_time_microseconds(void)
 {
     struct timespec ts;
     
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return (ts.tv_sec * 1000000 + ts.tv_nsec / 1000.0);
+}
+
+// Function to insert an element into a sorted sequence with minimal comparisons
+void mergeInsert(std::vector<unsigned int>& sorted, unsigned int element) {
+    int left = 0, right = sorted.size() - 1;
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        if (element < sorted[mid]) {
+            right = mid - 1;
+        } else {
+            left = mid + 1;
+        }
+    }
+    sorted.insert(sorted.begin() + left, element);
+}
+
+// Ford-Johnson sorting function
+std::vector<unsigned int> fordJohnsonSort(std::vector<unsigned int> arr) {
+    if (arr.size() <= 1) return arr;
+
+    std::vector<unsigned int> sorted;
+    
+    // Initial pairing and sorting
+    for (size_t i = 0; i + 1 < arr.size(); i += 2) {
+        unsigned int a = std::min(arr[i], arr[i + 1]);
+        unsigned int b = std::max(arr[i], arr[i + 1]);
+        if (sorted.empty() || b >= sorted.back()) {
+            sorted.push_back(a);
+            sorted.push_back(b);
+        } else {
+            mergeInsert(sorted, a);
+            mergeInsert(sorted, b);
+        }
+    }
+
+    // Handle the last unpaired element (if size is odd)
+    if (arr.size() % 2 == 1) {
+        mergeInsert(sorted, arr.back());
+    }
+
+    return sorted;
 }
