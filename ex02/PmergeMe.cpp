@@ -6,13 +6,13 @@
 /*   By: bcastelo <bcastelo@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 11:22:23 by bcastelo          #+#    #+#             */
-/*   Updated: 2025/02/09 22:10:50 by bcastelo         ###   ########.fr       */
+/*   Updated: 2025/02/10 21:55:38 by bcastelo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "PmergeMe.hpp"
 
-void sort_pairs_with_vector(std::vector<unsigned int>& data, std::vector<unsigned int>::iterator start, std::vector<unsigned int>::iterator end, unsigned int set_size);
+void sort_pairs_with_vector(std::vector<unsigned int>::iterator start, std::vector<unsigned int>::iterator end);
 
 void sort_all_pairs_with_vector(std::vector<unsigned int>& data, std::vector<unsigned int>::iterator start, std::vector<unsigned int>::iterator end);
 
@@ -42,8 +42,7 @@ int sort_with_vector(int argc, char **argv)
     start = get_time_microseconds();
     if (!insert_into_vector(argc, argv, unordered))
         return (-1);
-    sort_pairs_with_vector(unordered, unordered.begin(), unordered.end(), 1);
-    sort_all_pairs_with_vector(unordered, unordered.begin(), unordered.end());
+    sort_pairs_with_vector(unordered.begin(), unordered.end());
     end = get_time_microseconds();
     print_unordered(argc, argv);
     print_vector(unordered, "After : ");
@@ -51,9 +50,10 @@ int sort_with_vector(int argc, char **argv)
     return (0);
 }
 
-void sort_pairs_with_vector(std::vector<unsigned int>& data, std::vector<unsigned int>::iterator start, std::vector<unsigned int>::iterator end, unsigned int set_size)
+void sort_pairs_with_vector(std::vector<unsigned int>::iterator start, std::vector<unsigned int>::iterator end)
 {
     unsigned int aux;
+    unsigned int set_size = 1;
     unsigned int pair_size = set_size * 2;
     std::vector<unsigned int>::iterator init = start;
     
@@ -70,9 +70,6 @@ void sort_pairs_with_vector(std::vector<unsigned int>& data, std::vector<unsigne
         }
         init += pair_size;
     }
-    print_vector(data, "Iteration : ");
-    if (pair_size < end - start)
-        sort_pairs_with_vector(data, start, end, set_size * 2);
 }
 
 void sort_all_pairs_with_vector(std::vector<unsigned int>& data, std::vector<unsigned int>::iterator start, std::vector<unsigned int>::iterator end)
