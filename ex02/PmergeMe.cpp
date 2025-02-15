@@ -6,7 +6,7 @@
 /*   By: bcastelo <bcastelo@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 11:22:23 by bcastelo          #+#    #+#             */
-/*   Updated: 2025/02/10 21:55:38 by bcastelo         ###   ########.fr       */
+/*   Updated: 2025/02/15 12:04:48 by bcastelo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 void sort_pairs_with_vector(std::vector<unsigned int>::iterator start, std::vector<unsigned int>::iterator end);
 
 void sort_all_pairs_with_vector(std::vector<unsigned int>& data, std::vector<unsigned int>::iterator start, std::vector<unsigned int>::iterator end);
+
+void merge_insertion_with_vector(std::vector<unsigned int>& numbers, unsigned int nbr);
 
 int insert_into_vector(int argc, char **argv, std::vector<unsigned int>& numbers);
 
@@ -94,6 +96,23 @@ void sort_all_pairs_with_vector(std::vector<unsigned int>& data, std::vector<uns
             print_vector(data, "Sorting : ");
         }
     }
+}
+
+void merge_insertion_with_vector(std::vector<unsigned int>& numbers, unsigned int nbr)
+{
+    std::vector<unsigned int>::iterator left = numbers.begin();
+    std::vector<unsigned int>::iterator right = numbers.end() - 1;
+    std::vector<unsigned int>::iterator mid;
+
+    while (left <= right)
+    {
+        mid = left + (right - left) / 2;
+        if (*mid > nbr)
+            right = mid - 1;
+        else
+            left = mid + 1;
+    }
+    numbers.insert(left, nbr);
 }
 
 int insert_into_vector(int argc, char **argv, std::vector<unsigned int>& numbers)
