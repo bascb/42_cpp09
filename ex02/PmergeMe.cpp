@@ -6,7 +6,7 @@
 /*   By: bcastelo <bcastelo@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 11:22:23 by bcastelo          #+#    #+#             */
-/*   Updated: 2025/02/17 22:51:48 by bcastelo         ###   ########.fr       */
+/*   Updated: 2025/02/22 13:30:12 by bcastelo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,9 @@ void sort_pairs_with_vector(std::vector<unsigned int>::iterator start, std::vect
 
 void sort_all_pairs_with_vector(std::vector<unsigned int>& data, std::vector<unsigned int>::iterator start, std::vector<unsigned int>::iterator end);
 
-void merge_insertion_with_vector(std::vector<unsigned int>& numbers, unsigned int nbr);
+std::vector<unsigned int>::iterator merge_insertion_with_vector(std::vector<unsigned int>& numbers, unsigned int nbr);
+
+void sort_larger_elements_with_vector(std::vector<unsigned int>& main, std::vector<unsigned int>& pend, std::vector<unsigned int>& original);
 
 void insert_to_main_with_vector(std::vector<unsigned int>& main, std::vector<unsigned int>& pend);
 
@@ -30,7 +32,7 @@ bool is_duplicated_in_vector(std::vector<unsigned int>& data, unsigned int value
 
 void print_vector(std::vector<unsigned int>& data, std::string label);
 
-void print_unordered(int argc, char **argv);
+void print_original(int argc, char **argv);
 
 double get_time_microseconds(void);
 
@@ -38,20 +40,23 @@ std::vector<unsigned int> fordJohnsonSort(std::vector<unsigned int> arr);
 
 int sort_with_vector(int argc, char **argv)
 {
-    std::vector<unsigned int> unordered;
-    std::vector<unsigned int> sorted;
+    std::vector<unsigned int> original;
+    std::vector<unsigned int> main;
+    std::vector<unsigned int> pend;
     double start;
     double end;
      
+    print_original(argc, argv);
     start = get_time_microseconds();
-    if (!insert_into_vector(argc, argv, unordered))
+    if (!insert_into_vector(argc, argv, original))
         return (-1);
-    sort_pairs_with_vector(unordered.begin(), unordered.end(), 1);
-    insert_to_main_with_vector(sorted, unordered);
+    sort_pairs_with_vector(original.begin(), original.end(), 1);
+    print_vector(original, "Pairs ordered : ");
+    sort_larger_elements_with_vector(main, pend, original);
+    insert_to_main_with_vector(main, pend);
     end = get_time_microseconds();
-    print_unordered(argc, argv);
-    print_vector(sorted, "After : ");
-    std::cout << "Time to process a range of " << unordered.size() << " elements with std::vector : " << end - start << " us" << std::endl;
+    print_vector(main, "After : ");
+    std::cout << "Time to process a range of " << original.size() << " elements with std::vector : " << end - start << " us" << std::endl;
     return (0);
 }
 
@@ -102,7 +107,7 @@ void sort_all_pairs_with_vector(std::vector<unsigned int>& data, std::vector<uns
     }
 }
 
-void merge_insertion_with_vector(std::vector<unsigned int>& numbers, unsigned int nbr)
+std::vector<unsigned int>::iterator merge_insertion_with_vector(std::vector<unsigned int>& numbers, unsigned int nbr)
 {
     std::vector<unsigned int>::iterator left = numbers.begin();
     std::vector<unsigned int>::iterator right = numbers.end() - 1;
@@ -111,7 +116,7 @@ void merge_insertion_with_vector(std::vector<unsigned int>& numbers, unsigned in
     if (!numbers.size())
     {
         numbers.push_back(nbr);
-        return ;
+        return (numbers.begin());
     }
 
     while (left <= right)
@@ -123,22 +128,46 @@ void merge_insertion_with_vector(std::vector<unsigned int>& numbers, unsigned in
             left = mid + 1;
     }
     numbers.insert(left, nbr);
+    return (left);
+}
+
+void sort_larger_elements_with_vector(std::vector<unsigned int>& main, std::vector<unsigned int>& pend, std::vector<unsigned int>& original)
+{
+    std::vector<unsigned int>::iterator it;
+    std::vector<unsigned int>::iterator pos;
+
+    for (it = original.begin(); it < original.end(); ++it)
+    {
+        if ((it - original.begin()) % 2 == 1)
+        {
+            pos = merge_insertion_with_vector(main, *it);
+            std::cout << *it << std::endl;
+            if (!pend.size() || pos == main.end())
+                pend.push_back(*(it - 1));
+            else
+                pend.insert(pos, *(it - 1));
+            print_vector(main, "Main:");
+            print_vector(pend, "Pend:");
+        }
+    }
+    print_vector(main, "Main:");
+    print_vector(pend, "Pend:");
 }
 
 void insert_to_main_with_vector(std::vector<unsigned int>& main, std::vector<unsigned int>& pend)
 {
-    static bool first_time = true;
-    unsigned int step = 1;
+    //static bool first_time = true;
+    //unsigned int step = 1;
     
     print_vector(pend, "Pend:");
-    if (first_time)
+    /*if (first_time)
     {
         merge_insertion_with_vector(main, *pend.begin());
         pend.erase(pend.begin());
         step = 2;
         first_time = false;
-    }
-    for (std::vector<unsigned int>::iterator it = pend.begin(); it < pend.end(); it += step)
+    }*/
+    for (std::vector<unsigned int>::iterator it = pend.begin(); it < pend.end(); ++it)
     {
         merge_insertion_with_vector(main, *it);
         pend.erase(it);
@@ -209,7 +238,7 @@ void print_vector(std::vector<unsigned int>& data, std::string label)
     std::cout << std::endl;
 }
 
-void print_unordered(int argc, char **argv)
+void print_original(int argc, char **argv)
 {
     std::cout << "Before : "; 
     for (int i = 1; i < argc; ++i)
