@@ -6,7 +6,7 @@
 /*   By: bcastelo <bcastelo@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 11:22:23 by bcastelo          #+#    #+#             */
-/*   Updated: 2025/02/22 13:30:12 by bcastelo         ###   ########.fr       */
+/*   Updated: 2025/03/09 22:20:42 by bcastelo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,11 @@ void sort_pairs_with_vector(std::vector<unsigned int>::iterator start, std::vect
 
 void sort_all_pairs_with_vector(std::vector<unsigned int>& data, std::vector<unsigned int>::iterator start, std::vector<unsigned int>::iterator end);
 
-std::vector<unsigned int>::iterator merge_insertion_with_vector(std::vector<unsigned int>& numbers, unsigned int nbr);
+unsigned int merge_insertion_with_vector(std::vector<unsigned int>& numbers, unsigned int nbr);
 
 void sort_larger_elements_with_vector(std::vector<unsigned int>& main, std::vector<unsigned int>& pend, std::vector<unsigned int>& original);
+
+void insert_into_main_with_vector(std::vector<unsigned int>& main, std::vector<unsigned int>& pend);
 
 void insert_to_main_with_vector(std::vector<unsigned int>& main, std::vector<unsigned int>& pend);
 
@@ -36,6 +38,10 @@ void print_original(int argc, char **argv);
 
 double get_time_microseconds(void);
 
+double diff_in_microseconds(struct timespec start, struct timespec end);
+
+void print_diff_time(std::string step, struct timespec start, struct timespec end);
+
 std::vector<unsigned int> fordJohnsonSort(std::vector<unsigned int> arr);
 
 int sort_with_vector(int argc, char **argv)
@@ -43,20 +49,18 @@ int sort_with_vector(int argc, char **argv)
     std::vector<unsigned int> original;
     std::vector<unsigned int> main;
     std::vector<unsigned int> pend;
-    double start;
-    double end;
-     
-    print_original(argc, argv);
-    start = get_time_microseconds();
+    struct timespec start, end;
+
+    //print_original(argc, argv);
+    clock_gettime(CLOCK_MONOTONIC, &start);
     if (!insert_into_vector(argc, argv, original))
         return (-1);
     sort_pairs_with_vector(original.begin(), original.end(), 1);
-    print_vector(original, "Pairs ordered : ");
     sort_larger_elements_with_vector(main, pend, original);
-    insert_to_main_with_vector(main, pend);
-    end = get_time_microseconds();
-    print_vector(main, "After : ");
-    std::cout << "Time to process a range of " << original.size() << " elements with std::vector : " << end - start << " us" << std::endl;
+    insert_into_main_with_vector(main, pend);
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    //print_vector(main, "After : ");
+    std::cout << "Time to process a range of " << original.size() << " elements with std::vector : " << diff_in_microseconds(start, end) << " us" << std::endl;
     return (0);
 }
 
@@ -107,16 +111,17 @@ void sort_all_pairs_with_vector(std::vector<unsigned int>& data, std::vector<uns
     }
 }
 
-std::vector<unsigned int>::iterator merge_insertion_with_vector(std::vector<unsigned int>& numbers, unsigned int nbr)
+unsigned int merge_insertion_with_vector(std::vector<unsigned int>& numbers, unsigned int nbr)
 {
     std::vector<unsigned int>::iterator left = numbers.begin();
     std::vector<unsigned int>::iterator right = numbers.end() - 1;
     std::vector<unsigned int>::iterator mid;
+    unsigned int pos;
 
     if (!numbers.size())
     {
         numbers.push_back(nbr);
-        return (numbers.begin());
+        return (0);
     }
 
     while (left <= right)
@@ -127,52 +132,53 @@ std::vector<unsigned int>::iterator merge_insertion_with_vector(std::vector<unsi
         else
             left = mid + 1;
     }
+    pos = left - numbers.begin();
     numbers.insert(left, nbr);
-    return (left);
+    return (pos);
 }
 
 void sort_larger_elements_with_vector(std::vector<unsigned int>& main, std::vector<unsigned int>& pend, std::vector<unsigned int>& original)
 {
     std::vector<unsigned int>::iterator it;
-    std::vector<unsigned int>::iterator pos;
+    unsigned int pos;
 
-    for (it = original.begin(); it < original.end(); ++it)
+    for (it = original.begin() + 1; it < original.end(); it += 2)
     {
-        if ((it - original.begin()) % 2 == 1)
-        {
-            pos = merge_insertion_with_vector(main, *it);
-            std::cout << *it << std::endl;
-            if (!pend.size() || pos == main.end())
-                pend.push_back(*(it - 1));
-            else
-                pend.insert(pos, *(it - 1));
-            print_vector(main, "Main:");
-            print_vector(pend, "Pend:");
-        }
+        pos = merge_insertion_with_vector(main, *it);
+        if (!pend.size() || pend.begin() + pos >= pend.end())
+            pend.push_back(*(it - 1));
+        else
+            pend.insert(pend.begin() + pos, *(it - 1));
     }
-    print_vector(main, "Main:");
-    print_vector(pend, "Pend:");
+    if (original.size() % 2 ==1)
+        pend.push_back(*(it - 1));
+    main.insert(main.begin(), *(pend.begin()));
+    pend.erase(pend.begin());
+}
+
+void insert_into_main_with_vector(std::vector<unsigned int>& main, std::vector<unsigned int>& pend)
+{
+    std::vector<unsigned int>::iterator it;
+    std::vector<unsigned int>::iterator mid = pend.begin() + (pend.end() - 1 - pend.begin()) / 2;
+
+    for (it = pend.begin() + 1; it < mid; it += 2)
+    {
+        merge_insertion_with_vector(main, *it);
+        merge_insertion_with_vector(main, *(it - 1));
+    }
+    for (it = pend.end() - 1; it >= mid; --it)
+    {
+        merge_insertion_with_vector(main, *it);
+    }
 }
 
 void insert_to_main_with_vector(std::vector<unsigned int>& main, std::vector<unsigned int>& pend)
 {
-    //static bool first_time = true;
-    //unsigned int step = 1;
-    
-    print_vector(pend, "Pend:");
-    /*if (first_time)
-    {
-        merge_insertion_with_vector(main, *pend.begin());
-        pend.erase(pend.begin());
-        step = 2;
-        first_time = false;
-    }*/
     for (std::vector<unsigned int>::iterator it = pend.begin(); it < pend.end(); ++it)
     {
         merge_insertion_with_vector(main, *it);
         pend.erase(it);
     }
-    print_vector(pend, "Pend:");
     if (pend.size())
         insert_to_main_with_vector(main, pend);
 }
@@ -189,6 +195,7 @@ int insert_into_vector(int argc, char **argv, std::vector<unsigned int>& numbers
         while (iss >> token)
         {
             if (iss.fail() || !is_all_digits(token) || !push_number_to_vector(numbers, token))
+            if (!push_number_to_vector(numbers, argv[i]))
 	        {
 		        std::cerr << "Error: invalid input." << std::endl;
 		        return (0);
@@ -205,8 +212,8 @@ bool push_number_to_vector(std::vector<unsigned int>& numbers, std::string numbe
     unsigned int number;
     
 	convert_number >> number;
-	if (convert_number.fail() || is_duplicated_in_vector(numbers, number))
-        return (false);
+   if (convert_number.fail() || is_duplicated_in_vector(numbers, number))
+       return (false);
     numbers.push_back(number);
     return (true);
 }
@@ -254,6 +261,15 @@ double get_time_microseconds(void)
     
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return (ts.tv_sec * 1000000 + ts.tv_nsec / 1000.0);
+}
+
+double diff_in_microseconds(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec) * 1.0e6 + (end.tv_nsec - start.tv_nsec) / 1.0e3;
+}
+
+void print_diff_time(std::string step, struct timespec start, struct timespec end)
+{
+    std::cout << step << " : " << diff_in_microseconds(start, end) << std::endl;
 }
 
 // Function to insert an element into a sorted sequence with minimal comparisons
