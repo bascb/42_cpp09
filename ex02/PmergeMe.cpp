@@ -6,7 +6,7 @@
 /*   By: bcastelo <bcastelo@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 11:22:23 by bcastelo          #+#    #+#             */
-/*   Updated: 2025/03/09 22:20:42 by bcastelo         ###   ########.fr       */
+/*   Updated: 2025/03/15 11:38:48 by bcastelo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void sort_pairs_with_vector(std::vector<unsigned int>::iterator start, std::vect
 
 void sort_all_pairs_with_vector(std::vector<unsigned int>& data, std::vector<unsigned int>::iterator start, std::vector<unsigned int>::iterator end);
 
-unsigned int merge_insertion_with_vector(std::vector<unsigned int>& numbers, unsigned int nbr);
+unsigned int binary_insertion_with_vector(std::vector<unsigned int>& numbers, unsigned int nbr);
 
 void sort_larger_elements_with_vector(std::vector<unsigned int>& main, std::vector<unsigned int>& pend, std::vector<unsigned int>& original);
 
@@ -44,7 +44,7 @@ void print_diff_time(std::string step, struct timespec start, struct timespec en
 
 std::vector<unsigned int> fordJohnsonSort(std::vector<unsigned int> arr);
 
-int sort_with_vector(int argc, char **argv)
+int merge_insertion_with_vector(int argc, char **argv)
 {
     std::vector<unsigned int> original;
     std::vector<unsigned int> main;
@@ -111,7 +111,7 @@ void sort_all_pairs_with_vector(std::vector<unsigned int>& data, std::vector<uns
     }
 }
 
-unsigned int merge_insertion_with_vector(std::vector<unsigned int>& numbers, unsigned int nbr)
+unsigned int binary_insertion_with_vector(std::vector<unsigned int>& numbers, unsigned int nbr)
 {
     std::vector<unsigned int>::iterator left = numbers.begin();
     std::vector<unsigned int>::iterator right = numbers.end() - 1;
@@ -144,7 +144,7 @@ void sort_larger_elements_with_vector(std::vector<unsigned int>& main, std::vect
 
     for (it = original.begin() + 1; it < original.end(); it += 2)
     {
-        pos = merge_insertion_with_vector(main, *it);
+        pos = binary_insertion_with_vector(main, *it);
         if (!pend.size() || pend.begin() + pos >= pend.end())
             pend.push_back(*(it - 1));
         else
@@ -163,12 +163,12 @@ void insert_into_main_with_vector(std::vector<unsigned int>& main, std::vector<u
 
     for (it = pend.begin() + 1; it < mid; it += 2)
     {
-        merge_insertion_with_vector(main, *it);
-        merge_insertion_with_vector(main, *(it - 1));
+        binary_insertion_with_vector(main, *it);
+        binary_insertion_with_vector(main, *(it - 1));
     }
     for (it = pend.end() - 1; it >= mid; --it)
     {
-        merge_insertion_with_vector(main, *it);
+        binary_insertion_with_vector(main, *it);
     }
 }
 
@@ -176,7 +176,7 @@ void insert_to_main_with_vector(std::vector<unsigned int>& main, std::vector<uns
 {
     for (std::vector<unsigned int>::iterator it = pend.begin(); it < pend.end(); ++it)
     {
-        merge_insertion_with_vector(main, *it);
+        binary_insertion_with_vector(main, *it);
         pend.erase(it);
     }
     if (pend.size())

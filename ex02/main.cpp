@@ -6,7 +6,7 @@
 /*   By: bcastelo <bcastelo@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 14:39:58 by bcastelo          #+#    #+#             */
-/*   Updated: 2025/03/09 17:29:27 by bcastelo         ###   ########.fr       */
+/*   Updated: 2025/03/15 11:35:43 by bcastelo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int	main(int argc, char **argv)
 
     for (int i = 0; i < 100; ++i)
     {
-    if (sort_with_vector(argc, argv) == -1)
+    if (merge_insertion_with_vector(argc, argv) == -1)
         return (1);
     }
     

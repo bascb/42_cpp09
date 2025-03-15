@@ -6,7 +6,7 @@
 /*   By: bcastelo <bcastelo@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 11:19:43 by bcastelo          #+#    #+#             */
-/*   Updated: 2025/02/04 22:55:47 by bcastelo         ###   ########.fr       */
+/*   Updated: 2025/03/15 11:35:51 by bcastelo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,6 @@
 #include <algorithm> 
 #include <ctime> 
 
-int sort_with_vector(int argc, char **argv);
+int merge_insertion_with_vector(int argc, char **argv);
 
 #endif
