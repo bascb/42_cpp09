@@ -6,7 +6,7 @@
 /*   By: bcastelo <bcastelo@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 11:22:23 by bcastelo          #+#    #+#             */
-/*   Updated: 2025/03/20 22:43:56 by bcastelo         ###   ########.fr       */
+/*   Updated: 2025/03/22 11:14:39 by bcastelo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ void sort_pairs_with_vector(std::vector<unsigned int>::iterator start, std::vect
 void sort_all_pairs_with_vector(std::vector<unsigned int>& data, std::vector<unsigned int>::iterator start, std::vector<unsigned int>::iterator end);
 
 unsigned int binary_insertion_with_vector(std::vector<unsigned int>& numbers, unsigned int nbr);
+
+void populate_main_with_vector(std::vector<unsigned int>& main, std::vector<unsigned int>& pend, unsigned int to_main, unsigned int to_pend);
 
 void sort_larger_elements_with_vector(std::vector<unsigned int>& main, std::vector<unsigned int>& pend, std::vector<unsigned int>& original);
 
@@ -40,7 +42,7 @@ int merge_insertion_with_vector(std::vector<unsigned int>& original)
 {
     std::vector<unsigned int> main;
     std::vector<unsigned int> pend;
-    /*std::vector<unsigned int>::iterator it;
+    std::vector<unsigned int>::iterator it;
 
     if (original.size() <= 1)
         return (0);
@@ -48,20 +50,24 @@ int merge_insertion_with_vector(std::vector<unsigned int>& original)
     {
         if (*it > *(it + 1))
         {
-            main.push_back(*it);
-            pend.push_back(*(it + 1));
+            populate_main_with_vector(main, pend, *it, *(it + 1));
+            //main.push_back(*it);
+            //pend.push_back(*(it + 1));
         }
         else
         {
-            main.push_back(*(it + 1));
-            pend.push_back(*it);
+            populate_main_with_vector(main, pend,  *(it + 1), *it);
+            //main.push_back(*(it + 1));
+            //pend.push_back(*it);
         }
     }
     if (original.size() % 2 == 1)
         pend.push_back(*(original.end() - 1));
-    merge_insertion_with_vector(main); */
-    sort_pairs_with_vector(original.begin(), original.end(), 1);
-    sort_larger_elements_with_vector(main, pend, original);
+    main.insert(main.begin(), *(pend.begin()));
+    pend.erase(pend.begin());
+    //merge_insertion_with_vector(main);
+    //sort_pairs_with_vector(original.begin(), original.end(), 1);
+    //sort_larger_elements_with_vector(main, pend, original);
     insert_into_main_with_vector(main, pend);
     original = main;
     return (0);
@@ -140,18 +146,24 @@ unsigned int binary_insertion_with_vector(std::vector<unsigned int>& numbers, un
     return (pos);
 }
 
+void populate_main_with_vector(std::vector<unsigned int>& main, std::vector<unsigned int>& pend, unsigned int to_main, unsigned int to_pend)
+{
+    unsigned int pos;
+
+    pos = binary_insertion_with_vector(main, to_main);
+    if (!pend.size() || pend.begin() + pos >= pend.end())
+        pend.push_back(to_pend);
+    else
+        pend.insert(pend.begin() + pos, to_pend);
+}
+
 void sort_larger_elements_with_vector(std::vector<unsigned int>& main, std::vector<unsigned int>& pend, std::vector<unsigned int>& original)
 {
     std::vector<unsigned int>::iterator it;
-    unsigned int pos;
 
     for (it = original.begin() + 1; it < original.end(); it += 2)
     {
-        pos = binary_insertion_with_vector(main, *it);
-        if (!pend.size() || pend.begin() + pos >= pend.end())
-            pend.push_back(*(it - 1));
-        else
-            pend.insert(pend.begin() + pos, *(it - 1));
+        populate_main_with_vector(main, pend, *it, *(it - 1));
     }
     if (original.size() % 2 ==1)
         pend.push_back(*(it - 1));
