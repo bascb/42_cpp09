@@ -6,7 +6,7 @@
 /*   By: bcastelo <bcastelo@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 11:22:23 by bcastelo          #+#    #+#             */
-/*   Updated: 2025/03/15 11:38:48 by bcastelo         ###   ########.fr       */
+/*   Updated: 2025/03/20 22:43:56 by bcastelo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,43 +24,46 @@ void insert_into_main_with_vector(std::vector<unsigned int>& main, std::vector<u
 
 void insert_to_main_with_vector(std::vector<unsigned int>& main, std::vector<unsigned int>& pend);
 
-int insert_into_vector(int argc, char **argv, std::vector<unsigned int>& numbers);
-
 bool push_number_to_vector(std::vector<unsigned int>& numbers, std::string number_str);
 
 bool is_all_digits(std::string str);
 
 bool is_duplicated_in_vector(std::vector<unsigned int>& data, unsigned int value);
 
-void print_vector(std::vector<unsigned int>& data, std::string label);
-
-void print_original(int argc, char **argv);
-
 double get_time_microseconds(void);
-
-double diff_in_microseconds(struct timespec start, struct timespec end);
 
 void print_diff_time(std::string step, struct timespec start, struct timespec end);
 
 std::vector<unsigned int> fordJohnsonSort(std::vector<unsigned int> arr);
 
-int merge_insertion_with_vector(int argc, char **argv)
+int merge_insertion_with_vector(std::vector<unsigned int>& original)
 {
-    std::vector<unsigned int> original;
     std::vector<unsigned int> main;
     std::vector<unsigned int> pend;
-    struct timespec start, end;
+    /*std::vector<unsigned int>::iterator it;
 
-    //print_original(argc, argv);
-    clock_gettime(CLOCK_MONOTONIC, &start);
-    if (!insert_into_vector(argc, argv, original))
-        return (-1);
+    if (original.size() <= 1)
+        return (0);
+    for (it = original.begin(); it + 1 < original.end(); it += 2)
+    {
+        if (*it > *(it + 1))
+        {
+            main.push_back(*it);
+            pend.push_back(*(it + 1));
+        }
+        else
+        {
+            main.push_back(*(it + 1));
+            pend.push_back(*it);
+        }
+    }
+    if (original.size() % 2 == 1)
+        pend.push_back(*(original.end() - 1));
+    merge_insertion_with_vector(main); */
     sort_pairs_with_vector(original.begin(), original.end(), 1);
     sort_larger_elements_with_vector(main, pend, original);
     insert_into_main_with_vector(main, pend);
-    clock_gettime(CLOCK_MONOTONIC, &end);
-    //print_vector(main, "After : ");
-    std::cout << "Time to process a range of " << original.size() << " elements with std::vector : " << diff_in_microseconds(start, end) << " us" << std::endl;
+    original = main;
     return (0);
 }
 
