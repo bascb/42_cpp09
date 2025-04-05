@@ -6,7 +6,7 @@
 /*   By: bcastelo <bcastelo@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 11:22:23 by bcastelo          #+#    #+#             */
-/*   Updated: 2025/03/22 11:14:39 by bcastelo         ###   ########.fr       */
+/*   Updated: 2025/03/31 19:40:27 by bcastelo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ bool is_all_digits(std::string str);
 
 bool is_duplicated_in_vector(std::vector<unsigned int>& data, unsigned int value);
 
-double get_time_microseconds(void);
+//double get_time_microseconds(void);
 
 void print_diff_time(std::string step, struct timespec start, struct timespec end);
 
@@ -278,14 +278,10 @@ double get_time_microseconds(void)
     return (ts.tv_sec * 1000000 + ts.tv_nsec / 1000.0);
 }
 
-double diff_in_microseconds(struct timespec start, struct timespec end) {
-    return (end.tv_sec - start.tv_sec) * 1.0e6 + (end.tv_nsec - start.tv_nsec) / 1.0e3;
-}
-
-void print_diff_time(std::string step, struct timespec start, struct timespec end)
-{
-    std::cout << step << " : " << diff_in_microseconds(start, end) << std::endl;
-}
+//void print_diff_time(std::string step, struct timespec start, struct timespec end)
+//{
+//    std::cout << step << " : " << diff_in_microseconds(start, end) << std::endl;
+//}
 
 // Function to insert an element into a sorted sequence with minimal comparisons
 void mergeInsert(std::vector<unsigned int>& sorted, unsigned int element) {
