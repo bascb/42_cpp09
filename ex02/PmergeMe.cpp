@@ -6,7 +6,7 @@
 /*   By: bcastelo <bcastelo@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 11:22:23 by bcastelo          #+#    #+#             */
-/*   Updated: 2025/03/31 19:40:27 by bcastelo         ###   ########.fr       */
+/*   Updated: 2025/04/05 11:47:07 by bcastelo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void sort_pairs_with_vector(std::vector<unsigned int>::iterator start, std::vector<unsigned int>::iterator end, unsigned int set_size);
 
-void sort_all_pairs_with_vector(std::vector<unsigned int>& data, std::vector<unsigned int>::iterator start, std::vector<unsigned int>::iterator end);
+unsigned int sort_all_pairs_with_vector(std::vector<unsigned int>::iterator start, std::vector<unsigned int>::iterator end);
 
 unsigned int binary_insertion_with_vector(std::vector<unsigned int>& numbers, unsigned int nbr);
 
@@ -43,29 +43,40 @@ int merge_insertion_with_vector(std::vector<unsigned int>& original)
     std::vector<unsigned int> main;
     std::vector<unsigned int> pend;
     std::vector<unsigned int>::iterator it;
+    static bool first_time = true;
+    
+    main = original;
+    if (first_time)
+    {
+        sort_pairs_with_vector(main.begin(), main.end(), 1);
+        first_time = false;
+    }
+    if (!sort_all_pairs_with_vector(main.begin(), main.end()))
+        return (0);
 
-    if (original.size() <= 1)
+    /*if (original.size() <= 1)
         return (0);
     for (it = original.begin(); it + 1 < original.end(); it += 2)
     {
         if (*it > *(it + 1))
         {
-            populate_main_with_vector(main, pend, *it, *(it + 1));
-            //main.push_back(*it);
-            //pend.push_back(*(it + 1));
+            //populate_main_with_vector(main, pend, *it, *(it + 1));
+            main.push_back(*it);
+            pend.push_back(*(it + 1));
         }
         else
         {
-            populate_main_with_vector(main, pend,  *(it + 1), *it);
-            //main.push_back(*(it + 1));
-            //pend.push_back(*it);
+            //populate_main_with_vector(main, pend,  *(it + 1), *it);
+            main.push_back(*(it + 1));
+            pend.push_back(*it);
         }
-    }
+    } */
+    merge_insertion_with_vector(main);
+    first_time = true;
     if (original.size() % 2 == 1)
         pend.push_back(*(original.end() - 1));
     main.insert(main.begin(), *(pend.begin()));
     pend.erase(pend.begin());
-    //merge_insertion_with_vector(main);
     //sort_pairs_with_vector(original.begin(), original.end(), 1);
     //sort_larger_elements_with_vector(main, pend, original);
     insert_into_main_with_vector(main, pend);
@@ -96,28 +107,32 @@ void sort_pairs_with_vector(std::vector<unsigned int>::iterator start, std::vect
     //    sort_pairs_with_vector(start, end, set_size * 2);
 }
 
-void sort_all_pairs_with_vector(std::vector<unsigned int>& data, std::vector<unsigned int>::iterator start, std::vector<unsigned int>::iterator end)
+unsigned int sort_all_pairs_with_vector(std::vector<unsigned int>::iterator start, std::vector<unsigned int>::iterator end)
 {
     std::vector<unsigned int>::iterator exte;
     std::vector<unsigned int>::iterator inte;
     unsigned int aux;
+    unsigned int swap_nbr;
     
-    for (exte = start + 1; exte + 2 < end; exte += 2)
+    swap_nbr = 0;
+    for (exte = start; exte < end - 1; exte += 2)
     {
-        for (inte = exte + 2; inte < end; inte += 2)
+        inte = exte + 2;
+        std::cout << "Before: " << *exte << " " << *inte << " ";
+        if (*(exte + 1) > *(inte + 1))
         {
-            if (*exte > *inte)
-            {
-                aux = *exte;
-                *exte = *inte;
-                *inte = aux;
-                aux = *(exte - 1);
-                *(exte - 1) = *(inte - 1);
-                *(inte - 1) = aux;
-            }
-            print_vector(data, "Sorting : ");
+            ++swap_nbr;
+            aux = *exte;
+            *exte = *inte;
+            *inte = aux;
+            aux = *(exte + 1);
+            *(exte + 1) = *(inte + 1);
+            *(inte + 1) = aux;
         }
+        std::cout << "After: " << *exte << " " << *inte << std::endl;
     }
+    std::cout << swap_nbr << std::endl;
+    return (swap_nbr);
 }
 
 unsigned int binary_insertion_with_vector(std::vector<unsigned int>& numbers, unsigned int nbr)
